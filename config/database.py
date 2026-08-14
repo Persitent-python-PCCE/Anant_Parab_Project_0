@@ -5,7 +5,6 @@ def get_connection():
     host = "localhost",
     user = "root",
     password = "X3raV5VrcMzt4x4U3nj5",
-    database = "user"
+    database = "ecommerce"
   )
-
   return connection
