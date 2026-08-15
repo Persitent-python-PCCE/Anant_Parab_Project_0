@@ -66,7 +66,8 @@ def main():
                     print("5. View All Products")
                     print("6. Manage Stock")
                     print("7. View All Orders")
-                    print("8. Logout")
+                    print("8. View All Users")
+                    print("9. Logout")
                     choice = input("Enter choice: ")
 
                     if choice == "1":
@@ -84,6 +85,8 @@ def main():
                     elif choice == "7":
                         order_controller.view_all_orders()
                     elif choice == "8":
+                        user_controller.view_all_users()
+                    elif choice == "9":
                         current_user = None
                     else:
                         print("Invalid choice.")
