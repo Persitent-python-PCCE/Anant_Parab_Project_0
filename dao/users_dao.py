@@ -1,3 +1,4 @@
+from logs.logger import log_event
 from config.database import get_connection
 
 class UserDAO:

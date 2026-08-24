@@ -1,3 +1,4 @@
+from logs.logger import log_event
 from dao.orders_dao import OrderDAO
 from dao.cart_dao import CartDAO
 from dao.stock_dao import StockDAO
@@ -15,6 +16,7 @@ class OrderService:
         items = self.cart_dao.get_cart_items(cart_id)
         
         if not items:
+            log_event("Validation failed: " + str("Cart is empty"))
             raise ValueError("Cart is empty")
 
         total = sum(item['unit_price'] * item['quantity'] for item in items)
@@ -22,6 +24,7 @@ class OrderService:
         for item in items:
             stock = self.stock_dao.get_stock_by_product(item['product_id'])
             if not stock or stock['quantity'] < item['quantity']:
+                log_event("Validation failed: " + str(f"Not enough stock for product ID {item['product_id']}"))
                 raise ValueError(f"Not enough stock for product ID {item['product_id']}")
 
         order = Orders(user_id=user_id, total_amount=total)
@@ -29,21 +32,25 @@ class OrderService:
         
         for item in items:
             if not self.stock_dao.reduce_stock(item['product_id'], item['quantity']):
+                log_event("Validation failed: " + str("Failed to reduce stock (concurrency issue)."))
                 raise ValueError("Failed to reduce stock (concurrency issue).")
             oi = OrderItems(order_id, item['product_id'], item['quantity'], item['unit_price'])
             self.order_dao.add_order_item(oi)
             
         self.cart_dao.clear_cart(cart_id)
+        log_event("Service operation successful")
         return order_id
 
     def get_order_history(self, user_id):
         orders = self.order_dao.get_orders_by_user(user_id)
         for o in orders:
             o['items'] = self.order_dao.get_order_items(o['order_id'])
+        log_event("Service operation successful")
         return orders
 
     def get_all_orders(self):
         orders = self.order_dao.get_all_orders()
         for o in orders:
             o['items'] = self.order_dao.get_order_items(o['order_id'])
+        log_event("Service operation successful")
         return orders

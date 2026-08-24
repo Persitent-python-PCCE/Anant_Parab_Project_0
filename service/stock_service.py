@@ -1,3 +1,4 @@
+from logs.logger import log_event
 from dao.stock_dao import StockDAO
 
 class StockService:
@@ -6,8 +7,10 @@ class StockService:
 
     def add_or_update_stock(self, product_id, quantity):
         if quantity <= 0:
+            log_event("Validation failed: " + str("Quantity must be positive"))
             raise ValueError("Quantity must be positive")
         self.stock_dao.add_or_update_stock(product_id, quantity)
 
     def get_stock(self, product_id):
+        log_event("Service operation successful")
         return self.stock_dao.get_stock_by_product(product_id)
